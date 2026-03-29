@@ -291,4 +291,35 @@ export interface SquadSDKConfig {
 
   /** Skill definitions. */
   readonly skills?: readonly SkillDefinition[];
+
+  /** Workflow pipeline definitions (Mermaid stateDiagram-v2). */
+  readonly workflows?: readonly WorkflowBuilderDefinition[];
+}
+
+// ---------------------------------------------------------------------------
+// Workflow pipeline
+// ---------------------------------------------------------------------------
+
+/** Trigger configuration for a workflow. */
+export interface WorkflowTriggerDefinition {
+  readonly type: 'manual' | 'message-pattern' | 'squad-route' | 'schedule';
+  /** Regex pattern (for message-pattern). */
+  readonly pattern?: string | RegExp;
+  /** Cron expression (for schedule). */
+  readonly schedule?: ScheduleExpression;
+}
+
+/** A workflow pipeline definition for the builder API. */
+export interface WorkflowBuilderDefinition {
+  readonly name: string;
+  readonly description?: string;
+  readonly trigger?: WorkflowTriggerDefinition;
+  /** Raw Mermaid stateDiagram-v2 text. */
+  readonly diagram: string;
+  /** Per-node timeout in ms (default: 300_000 = 5 min). */
+  readonly nodeTimeoutMs?: number;
+  /** Error strategy. */
+  readonly errorStrategy?: 'fail' | 'retry' | 'fallback';
+  /** Max retries when errorStrategy is 'retry'. */
+  readonly maxRetries?: number;
 }

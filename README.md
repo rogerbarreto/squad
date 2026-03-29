@@ -73,7 +73,7 @@ Squad proposes a team — each member named from a persistent thematic cast. You
 
 ---
 
-## All Commands (15 commands)
+## All Commands (16 commands)
 
 | Command | What it does |
 |---------|-------------|
@@ -87,6 +87,7 @@ Squad proposes a team — each member named from a persistent thematic cast. You
 | `squad shell` | Launch interactive shell explicitly |
 | `squad export` | Export squad to a portable JSON snapshot |
 | `squad import <file>` | Import squad from an export file |
+| `squad workflow list\|run\|show\|status\|history` | Manage workflow pipelines — define multi-stage pipelines with Mermaid stateDiagram-v2 syntax; supports agent nodes, human-in-the-loop, and orchestrator decisions |
 | `squad plugin marketplace add\|remove\|list\|browse` | Manage plugin marketplaces |
 | `squad upstream add\|remove\|list\|sync` | Manage upstream Squad sources |
 | `squad nap` | Context hygiene — compress, prune, archive; use `--deep` for aggressive compression, `--dry-run` to preview changes |

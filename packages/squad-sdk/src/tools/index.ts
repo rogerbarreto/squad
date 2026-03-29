@@ -557,12 +557,65 @@ export class ToolRegistry {
       },
     });
 
+    // --- squad_workflow tool ---
+
+    interface WorkflowRequest {
+      workflowName: string;
+      context?: string;
+      triggerAgent?: string;
+    }
+
+    const squadWorkflow = defineTool<WorkflowRequest>({
+      name: 'squad_workflow',
+      description: 'Trigger a workflow pipeline. Workflows are defined in .squad/workflows/ or squad.config.ts using Mermaid stateDiagram-v2 syntax.',
+      parameters: {
+        type: 'object',
+        properties: {
+          workflowName: { type: 'string', description: 'Name of the workflow to trigger' },
+          context: { type: 'string', description: 'Context string passed to the workflow' },
+          triggerAgent: { type: 'string', description: 'Agent name triggering the workflow' },
+        },
+        required: ['workflowName'],
+      },
+      handler: async (args) => {
+        if (!args.workflowName?.trim()) {
+          return {
+            textResultForLlm: 'Error: workflowName is required',
+            resultType: 'failure',
+            error: 'Missing required field: workflowName',
+          };
+        }
+
+        // Check that the workflow definition file exists
+        const workflowDir = path.join(this.squadRoot, 'workflows');
+        const workflowFile = path.join(workflowDir, `${args.workflowName}.md`);
+
+        if (!fs.existsSync(workflowFile)) {
+          return {
+            textResultForLlm: `Workflow not found: '${args.workflowName}'. Check .squad/workflows/ for available workflows.`,
+            resultType: 'failure',
+            error: `Workflow '${args.workflowName}' does not exist`,
+          };
+        }
+
+        return {
+          textResultForLlm: `Workflow '${args.workflowName}' triggered successfully.${args.context ? ` Context: ${args.context}` : ''}${args.triggerAgent ? ` Triggered by: ${args.triggerAgent}` : ''}`,
+          resultType: 'success',
+          toolTelemetry: {
+            workflowName: args.workflowName,
+            triggerAgent: args.triggerAgent ?? 'unknown',
+          },
+        };
+      },
+    });
+
     // Register all tools
     this.tools.set('squad_route', squadRoute);
     this.tools.set('squad_decide', squadDecide);
     this.tools.set('squad_memory', squadMemory);
     this.tools.set('squad_status', squadStatus);
     this.tools.set('squad_skill', squadSkill);
+    this.tools.set('squad_workflow', squadWorkflow);
   }
 
   /** Get all registered tools for session config */

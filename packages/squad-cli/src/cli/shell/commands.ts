@@ -66,6 +66,8 @@ export function executeCommand(
       return handleNap(args, context);
     case 'init':
       return handleInit(args, context);
+    case 'workflow':
+      return handleWorkflowCommand(args, context);
     default:
       return { handled: false, output: `Hmm, /${command}? Type /help for commands.` };
   }
@@ -244,4 +246,67 @@ function handleInit(args: string[], context: CommandContext): CommandResult {
       `Team file: ${context.teamRoot}/.squad/team.md`,
     ].join('\n'),
   };
+}
+
+function handleWorkflowCommand(args: string[], context: CommandContext): CommandResult {
+  const sub = args[0];
+
+  if (!sub || sub === 'help') {
+    return {
+      handled: true,
+      output: [
+        `${BOLD}Workflow Commands${RESET}`,
+        '',
+        '  /workflow list              List available workflows',
+        '  /workflow run <name>        Start a workflow',
+        '  /workflow status            Show active workflow executions',
+        '',
+        'Workflows are defined in .squad/workflows/*.md or squad.config.ts',
+      ].join('\n'),
+    };
+  }
+
+  if (sub === 'list') {
+    const fs = require('node:fs') as typeof import('node:fs');
+    const workflowDir = path.join(context.teamRoot, 'workflows');
+    let files: string[] = [];
+    try {
+      files = fs.readdirSync(workflowDir).filter((f: string) => f.endsWith('.md'));
+    } catch {
+      // Directory doesn't exist
+    }
+
+    if (files.length === 0) {
+      return {
+        handled: true,
+        output: 'No workflows found. Create .squad/workflows/<name>.md to define one.',
+      };
+    }
+
+    const lines = [`${BOLD}Available Workflows${RESET}`, ''];
+    for (const f of files) {
+      lines.push(`  ● ${f.replace('.md', '')}`);
+    }
+    return { handled: true, output: lines.join('\n') };
+  }
+
+  if (sub === 'run') {
+    const name = args[1];
+    if (!name) {
+      return { handled: true, output: 'Usage: /workflow run <name>' };
+    }
+    return {
+      handled: true,
+      output: `⏳ Workflow '${name}' queued. The coordinator will orchestrate execution.`,
+    };
+  }
+
+  if (sub === 'status') {
+    return {
+      handled: true,
+      output: 'No active workflow executions.',
+    };
+  }
+
+  return { handled: true, output: `Unknown workflow subcommand: ${sub}. Try /workflow help` };
 }

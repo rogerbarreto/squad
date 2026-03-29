@@ -21,6 +21,7 @@ import type {
   TelemetryDefinition,
   SkillDefinition,
   SquadSDKConfig,
+  WorkflowBuilderDefinition,
 } from './types.js';
 
 // Re-export every type so consumers can `import { defineTeam, TeamDefinition } from './builders'`
@@ -42,6 +43,8 @@ export type {
   SkillDefinition,
   SkillTool,
   SquadSDKConfig,
+  WorkflowBuilderDefinition,
+  WorkflowTriggerDefinition,
 } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -458,6 +461,45 @@ export function defineDefaults(config: DefaultsDefinition): DefaultsDefinition {
  * });
  * ```
  */
+// ---------------------------------------------------------------------------
+// defineWorkflow
+// ---------------------------------------------------------------------------
+
+export function defineWorkflow(config: WorkflowBuilderDefinition): WorkflowBuilderDefinition {
+  assertObject(config, 'defineWorkflow');
+  assertNonEmptyString(config.name, 'name', 'defineWorkflow');
+  assertNonEmptyString(config.diagram, 'diagram', 'defineWorkflow');
+  assertOptionalString(config.description, 'description', 'defineWorkflow');
+  assertOptionalNumber(config.nodeTimeoutMs, 'nodeTimeoutMs', 'defineWorkflow');
+  assertOptionalNumber(config.maxRetries, 'maxRetries', 'defineWorkflow');
+
+  if (config.errorStrategy !== undefined) {
+    assertStringUnion(config.errorStrategy, ['fail', 'retry', 'fallback'] as const, 'errorStrategy', 'defineWorkflow');
+  }
+
+  if (config.trigger !== undefined) {
+    assertObject(config.trigger, 'defineWorkflow.trigger');
+    assertStringUnion(
+      config.trigger.type,
+      ['manual', 'message-pattern', 'squad-route', 'schedule'] as const,
+      'trigger.type',
+      'defineWorkflow',
+    );
+    if (config.trigger.type === 'message-pattern' && config.trigger.pattern === undefined) {
+      throw new BuilderValidationError('defineWorkflow', '"trigger.pattern" is required when trigger.type is "message-pattern"');
+    }
+    if (config.trigger.type === 'schedule' && config.trigger.schedule === undefined) {
+      throw new BuilderValidationError('defineWorkflow', '"trigger.schedule" is required when trigger.type is "schedule"');
+    }
+  }
+
+  return config;
+}
+
+// ---------------------------------------------------------------------------
+// defineSquad
+// ---------------------------------------------------------------------------
+
 export function defineSquad(config: SquadSDKConfig): SquadSDKConfig {
   assertObject(config, 'defineSquad');
   assertOptionalString(config.version, 'version', 'defineSquad');
@@ -484,6 +526,12 @@ export function defineSquad(config: SquadSDKConfig): SquadSDKConfig {
     assertArray(config.skills, 'skills', 'defineSquad');
     for (const skill of config.skills) {
       defineSkill(skill);
+    }
+  }
+  if (config.workflows !== undefined) {
+    assertArray(config.workflows, 'workflows', 'defineSquad');
+    for (const workflow of config.workflows) {
+      defineWorkflow(workflow);
     }
   }
 

@@ -52,6 +52,7 @@ export {
   defineTelemetry,
   defineDefaults,
   defineSkill,
+  defineWorkflow,
   defineSquad,
   BuilderValidationError,
 } from './builders/index.js';
@@ -73,7 +74,51 @@ export type {
   SkillDefinition as BuilderSkillDefinition,
   SkillTool as BuilderSkillTool,
   SquadSDKConfig,
+  WorkflowBuilderDefinition,
+  WorkflowTriggerDefinition,
 } from './builders/index.js';
+
+// Workflow pipeline
+export {
+  parseStateDiagram,
+  MermaidParseError,
+  WorkflowStateMachine,
+  WorkflowEngine,
+  FileWorkflowPersistence,
+  loadWorkflowsFromDirectory,
+  parseWorkflowMarkdown,
+  DEFAULT_NODE_TIMEOUT_MS,
+  DEFAULT_ERROR_STRATEGY,
+  DEFAULT_MAX_RETRIES,
+  WORKFLOW_RUNS_DIR,
+  WORKFLOWS_DIR,
+} from './workflow/index.js';
+export type {
+  WorkflowNodeType,
+  WorkflowNode,
+  WorkflowTransition,
+  WorkflowGraph,
+  WorkflowTriggerType,
+  WorkflowTrigger,
+  WorkflowDefinition,
+  WorkflowExecutionStatus,
+  WorkflowNodeExecutionStatus,
+  WorkflowNodeExecution,
+  WorkflowExecution,
+  WorkflowCheckpoint,
+  WorkflowEventType,
+  WorkflowEventPayload,
+  StateMachineStatus,
+  StateMachineSnapshot,
+  ForkTracker,
+  WorkflowEngineConfig,
+  WorkflowPersistence,
+  AgentSpawnFn,
+  HumanPromptFn,
+  DecisionEvalFn,
+  ExecutorDependencies,
+  ExecutorResult,
+} from './workflow/index.js';
 // Base Roles (built-in role catalog)
 export * from './roles/index.js';
 export * from './platform/index.js';

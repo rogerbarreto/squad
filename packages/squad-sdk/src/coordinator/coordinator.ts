@@ -50,6 +50,8 @@ export interface CoordinatorResult {
   spawnResults?: SpawnResult[];
   /** Time taken to handle the message in ms */
   durationMs: number;
+  /** Workflow execution ID (if a workflow was triggered) */
+  workflowId?: string;
 }
 
 // --- Coordinator Options ---

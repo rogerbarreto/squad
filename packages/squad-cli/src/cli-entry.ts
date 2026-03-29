@@ -352,6 +352,15 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (cmd === 'workflow') {
+    const { runWorkflow } = await import('./cli/commands/workflow.js');
+    const action = args[1];
+    const ctxIdx = args.indexOf('--context');
+    const context = (ctxIdx !== -1 && args[ctxIdx + 1]) ? args[ctxIdx + 1] : undefined;
+    await runWorkflow(process.cwd(), action, args.slice(2), { context });
+    return;
+  }
+
   if (cmd === 'copilot') {
     const { runCopilot } = await import('./cli/commands/copilot.js');
     const isOff = args.includes('--off');

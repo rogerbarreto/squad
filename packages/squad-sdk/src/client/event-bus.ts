@@ -17,7 +17,17 @@ export type SquadEventType =
   | 'session.error'
   | 'agent.milestone'
   | 'coordinator.routing'
-  | 'pool.health';
+  | 'pool.health'
+  // Workflow pipeline events
+  | 'workflow.started'
+  | 'workflow.node_started'
+  | 'workflow.node_completed'
+  | 'workflow.decision_made'
+  | 'workflow.human_prompt'
+  | 'workflow.human_response'
+  | 'workflow.transition'
+  | 'workflow.completed'
+  | 'workflow.failed';
 
 export interface SquadEvent {
   type: SquadEventType;
